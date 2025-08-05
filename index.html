@@ -3,24 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visualizador 360°</title>
+    <title>Galería 360°</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/photo-sphere-viewer.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>Visualizador 360°</h1>
-        <div id="viewer"></div>
-        <div class="controls">
-            <input type="file" id="image-upload" accept="image/*">
-            <p>Sube tu propia imagen 360° (formato equirectangular)</p>
+        <h1>Mis Fotos 360°</h1>
+        <div class="viewer-container">
+            <div id="viewer"></div>
         </div>
+        <div class="controls">
+            <button id="prev-btn">◀ Anterior</button>
+            <span id="photo-counter">1/4</span>
+            <button id="next-btn">Siguiente ▶</button>
+        </div>
+        <div class="thumbnails" id="thumbnails"></div>
     </div>
-    <!-- Librerías REQUERIDAS -->
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/uevent@2/browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/photo-sphere-viewer.min.js"></script>
-    <!-- Nuestro script -->
     <script src="script.js"></script>
 </body>
 </html>

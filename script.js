@@ -1,110 +1,152 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Lista de tus imágenes 360° en la carpeta assets
-    const images = [
-        'assets/foto1.jpg',
-        'assets/foto2.jpg',
-        'assets/foto3.jpg',
-        'assets/foto4.jpg'
-        // Añade más imágenes según necesites
-     ].filter(img => {
-        // Verificación automática de relación 2:1
-        return new Promise(resolve => {
-            const tester = new Image();
-            tester.src = img;
-            tester.onload = () => {
-                const isValid = Math.abs(tester.width / tester.height - 2) < 0.1;
-                if (!isValid) console.error(`Imagen ${img} no es 2:1 (${tester.width}x${tester.height})`);
-                resolve(isValid);
-            };
-            tester.onerror = () => resolve(false);
-        });
-    });
+    // Configuración inicial
+    const imageList = [
+        {
+            name: "Ejemplo 1",
+            path: "assets/foto1.jpg",
+        },
+        {
+            name: "Ejemplo 2", 
+            path: "assets/foto2.jpg",
+        }
+        // Añade más imágenes aquí
+    ];
 
-    let currentIndex = 0;
-    let viewer;
-
-    // Elementos UI
-    const ui = {
+    // Elementos del DOM
+    const dom = {
         viewer: document.getElementById('viewer'),
         prevBtn: document.getElementById('prev-btn'),
         nextBtn: document.getElementById('next-btn'),
-        counter: document.getElementById('photo-counter'),
-        thumbnails: document.getElementById('thumbnails'),
-        errorBox: document.getElementById('error-box')
+        photoInfo: document.getElementById('photo-info'),
+        thumbnails: document.getElementById('thumbnails')
     };
+
+    // Variables de estado
+    let currentIndex = 0;
+    let viewer = null;
+    let isLoading = false;
+
     // Inicialización
     initViewer();
-    // Eventos
-    ui.prevBtn.addEventListener('click', showPrevious);
-    ui.nextBtn.addEventListener('click', showNext);
-    document.addEventListener('keydown', handleKeys);
-    // Funciones principales
-    async function initViewer() {
-        if (images.length === 0) {
-            showError('No hay imágenes válidas (requieren relación 2:1)');
-            return;
-        }
-        loadCurrentImage();
-        createThumbnails();
-    }
-    function loadCurrentImage() {
-        if (viewer) viewer.destroy();
-        viewer = new PhotoSphereViewer.Viewer({
-            container: ui.viewer,
-            panorama: images[currentIndex],
-            loadingImg: 'https://i.imgur.com/WWX2T1m.gif',
-            loadingTxt: 'Cargando...',
-            navbar: getNavbar(),
-            touchmoveTwoFingers: true,
-            mousewheel: false
-        });
+    createThumbnails();
 
-        updateCounter();
+    // Event listeners
+    dom.prevBtn.addEventListener('click', showPrevious);
+    dom.nextBtn.addEventListener('click', showNext);
+    document.addEventListener('keydown', handleKeyDown);
+
+    // Funciones principales
+    function initViewer() {
+        if (viewer) {
+            viewer.destroy();
+        }
+
+        isLoading = true;
+        updateUI();
+
+        viewer = new PhotoSphereViewer.Viewer({
+            container: dom.viewer,
+            panorama: imageList[currentIndex].path,
+            loadingImg: 'https://i.imgur.com/WWX2T1m.gif',
+            loadingTxt: 'Cargando experiencia 360°...',
+            navbar: getNavbarItems(),
+            defaultYaw: '0deg',
+            autorotateDelay: 3000,
+            moveSpeed: 1.5,
+            mousewheel: false,
+            touchmoveTwoFingers: true,
+            onReady: () => {
+                isLoading = false;
+                updateUI();
+            },
+            onError: (err) => {
+                console.error('Error al cargar imagen:', err);
+                isLoading = false;
+                updateUI();
+                dom.photoInfo.textContent = 'Error al cargar imagen';
+            }
+        });
     }
-    function getNavbar() {
+
+    function getNavbarItems() {
         return [
             'autorotate',
             'zoom',
+            'move',
             'download',
             'fullscreen',
             {
-                title: 'VR Mode',
-                content: '👓 VR',
+                title: 'Modo VR',
+                content: '👓',
                 onClick: () => viewer.toggleVR()
             }
         ];
     }
+
     function showNext() {
-        currentIndex = (currentIndex + 1) % images.length;
-        loadCurrentImage();
+        if (isLoading) return;
+        
+        currentIndex = (currentIndex + 1) % imageList.length;
+        initViewer();
+        highlightThumbnail();
     }
+
     function showPrevious() {
-        currentIndex = (currentIndex - 1 + images.length) % images.length;
-        loadCurrentImage();
+        if (isLoading) return;
+        
+        currentIndex = (currentIndex - 1 + imageList.length) % imageList.length;
+        initViewer();
+        highlightThumbnail();
     }
-    function handleKeys(e) {
-        if (e.key === 'ArrowLeft') showPrevious();
+
+    function handleKeyDown(e) {
         if (e.key === 'ArrowRight') showNext();
+        if (e.key === 'ArrowLeft') showPrevious();
     }
-    function updateCounter() {
-        ui.counter.textContent = `${currentIndex + 1}/${images.length}`;
-    }
+
     function createThumbnails() {
-        ui.thumbnails.innerHTML = '';
-        images.forEach((img, index) => {
+        dom.thumbnails.innerHTML = '';
+        
+        imageList.forEach((image, index) => {
             const thumb = document.createElement('div');
-            thumb.className = `thumbnail ${index === currentIndex ? 'active' : ''}`;
-            thumb.innerHTML = `<img src="${img}" alt="Miniatura ${index + 1}">`;
+            thumb.className = 'thumbnail';
+            thumb.innerHTML = `
+                <img src="${image.thumbnail || image.path}" alt="${image.name}">
+                <div class="loading" style="display: none;">Cargando...</div>
+            `;
+            
             thumb.addEventListener('click', () => {
+                if (isLoading || index === currentIndex) return;
                 currentIndex = index;
-                loadCurrentImage();
+                initViewer();
+                highlightThumbnail();
             });
-            ui.thumbnails.appendChild(thumb);
+            
+            dom.thumbnails.appendChild(thumb);
+        });
+        
+        highlightThumbnail();
+    }
+
+    function highlightThumbnail() {
+        document.querySelectorAll('.thumbnail').forEach((thumb, index) => {
+            thumb.classList.toggle('active', index === currentIndex);
         });
     }
 
-    function showError(message) {
-        ui.errorBox.textContent = message;
-        ui.errorBox.style.display = 'block';
+    function updateUI() {
+        dom.prevBtn.disabled = isLoading;
+        dom.nextBtn.disabled = isLoading;
+        
+        if (isLoading) {
+            dom.photoInfo.textContent = 'Cargando...';
+        } else {
+            dom.photoInfo.textContent = `${imageList[currentIndex].name} (${currentIndex + 1}/${imageList.length})`;
+        }
+        
+        // Mostrar/ocultar indicadores de carga en miniaturas
+        document.querySelectorAll('.thumbnail .loading').forEach((loader, index) => {
+            loader.style.display = (isLoading && index === currentIndex) ? 'flex' : 'none';
+        });
     }
 });

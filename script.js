@@ -1,15 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Configuración inicial
-    const imageList = [
-        {
-            name: "Ejemplo 1",
-            path: "assets/foto1.jpg",
-        },
-        {
-            name: "Ejemplo 2", 
-            path: "assets/foto2.jpg",
-        }
-        // Añade más imágenes aquí
+    // Lista de imágenes (modifica con tus archivos)
+    const images = [
+        { name: "Foto 1", path: "assets/foto1.jpg" },
+        { name: "Foto 2", path: "assets/foto2.jpg" }
     ];
 
     // Elementos del DOM
@@ -17,136 +10,60 @@ document.addEventListener('DOMContentLoaded', function() {
         viewer: document.getElementById('viewer'),
         prevBtn: document.getElementById('prev-btn'),
         nextBtn: document.getElementById('next-btn'),
-        photoInfo: document.getElementById('photo-info'),
-        thumbnails: document.getElementById('thumbnails')
+        photoInfo: document.getElementById('photo-info')
     };
 
     // Variables de estado
     let currentIndex = 0;
-    let viewer = null;
-    let isLoading = false;
+    let viewer;
 
-    // Inicialización
-    initViewer();
-    createThumbnails();
-
-    // Event listeners
-    dom.prevBtn.addEventListener('click', showPrevious);
-    dom.nextBtn.addEventListener('click', showNext);
-    document.addEventListener('keydown', handleKeyDown);
-
-    // Funciones principales
+    // Iniciar visor
     function initViewer() {
-        if (viewer) {
-            viewer.destroy();
-        }
-
-        isLoading = true;
-        updateUI();
+        if (viewer) viewer.destroy();
 
         viewer = new PhotoSphereViewer.Viewer({
             container: dom.viewer,
-            panorama: imageList[currentIndex].path,
+            panorama: images[currentIndex].path,
             loadingImg: 'https://i.imgur.com/WWX2T1m.gif',
-            loadingTxt: 'Cargando experiencia 360°...',
-            navbar: getNavbarItems(),
-            defaultYaw: '0deg',
-            autorotateDelay: 3000,
-            moveSpeed: 1.5,
-            mousewheel: false,
-            touchmoveTwoFingers: true,
+            loadingTxt: 'Cargando...',
+            navbar: [
+                'autorotate',  // Rotación automática
+                'zoom',        // Zoom in/out
+                'fullscreen'   // Pantalla completa
+            ],
             onReady: () => {
-                isLoading = false;
-                updateUI();
+                dom.photoInfo.textContent = `${currentIndex + 1}/${images.length}`;
             },
             onError: (err) => {
-                console.error('Error al cargar imagen:', err);
-                isLoading = false;
-                updateUI();
-                dom.photoInfo.textContent = 'Error al cargar imagen';
+                console.error("Error al cargar:", err);
+                dom.photoInfo.textContent = "Error en la imagen";
             }
         });
     }
 
-    function getNavbarItems() {
-        return [
-            'autorotate',
-            'zoom',
-            'move',
-            'download',
-            'fullscreen',
-            {
-                title: 'Modo VR',
-                content: '👓',
-                onClick: () => viewer.toggleVR()
-            }
-        ];
-    }
-
+    // Navegación
     function showNext() {
-        if (isLoading) return;
-        
-        currentIndex = (currentIndex + 1) % imageList.length;
-        initViewer();
-        highlightThumbnail();
-    }
-
-    function showPrevious() {
-        if (isLoading) return;
-        
-        currentIndex = (currentIndex - 1 + imageList.length) % imageList.length;
-        initViewer();
-        highlightThumbnail();
-    }
-
-    function handleKeyDown(e) {
-        if (e.key === 'ArrowRight') showNext();
-        if (e.key === 'ArrowLeft') showPrevious();
-    }
-
-    function createThumbnails() {
-        dom.thumbnails.innerHTML = '';
-        
-        imageList.forEach((image, index) => {
-            const thumb = document.createElement('div');
-            thumb.className = 'thumbnail';
-            thumb.innerHTML = `
-                <img src="${image.thumbnail || image.path}" alt="${image.name}">
-                <div class="loading" style="display: none;">Cargando...</div>
-            `;
-            
-            thumb.addEventListener('click', () => {
-                if (isLoading || index === currentIndex) return;
-                currentIndex = index;
-                initViewer();
-                highlightThumbnail();
-            });
-            
-            dom.thumbnails.appendChild(thumb);
-        });
-        
-        highlightThumbnail();
-    }
-
-    function highlightThumbnail() {
-        document.querySelectorAll('.thumbnail').forEach((thumb, index) => {
-            thumb.classList.toggle('active', index === currentIndex);
-        });
-    }
-
-    function updateUI() {
-        dom.prevBtn.disabled = isLoading;
-        dom.nextBtn.disabled = isLoading;
-        
-        if (isLoading) {
-            dom.photoInfo.textContent = 'Cargando...';
-        } else {
-            dom.photoInfo.textContent = `${imageList[currentIndex].name} (${currentIndex + 1}/${imageList.length})`;
+        if (currentIndex < images.length - 1) {
+            currentIndex++;
+            initViewer();
         }
-        
-        // Mostrar/ocultar indicadores de carga en miniaturas
-        document.querySelectorAll('.thumbnail .loading').forEach((loader, index) => {
-            loader.style.display = (isLoading && index === currentIndex) ? 'flex' : 'none';
-        });
     }
+
+    function showPrev() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            initViewer();
+        }
+    }
+
+    // Eventos
+    dom.nextBtn.addEventListener('click', showNext);
+    dom.prevBtn.addEventListener('click', showPrev);
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') showNext();
+        if (e.key === 'ArrowLeft') showPrev();
+    });
+
+    // Iniciar con la primera imagen
+    initViewer();
 });

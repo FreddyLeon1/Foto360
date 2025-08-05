@@ -82,3 +82,35 @@ button:hover {
     border-color: #e74c3c;
     box-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
 }
+
+/* Verificador de imágenes */
+#error-box {
+    display: none;
+    background: #e74c3c;
+    color: white;
+    padding: 15px;
+    border-radius: 5px;
+    margin: 20px auto;
+    max-width: 500px;
+}
+
+/* Indicador de carga */
+.loading-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+/* Ajustes para móviles */
+@media (max-width: 768px) {
+    .viewer-container {
+        height: 300px !important;
+    }
+    
+    .thumbnail {
+        width: 80px !important;
+        height: 60px !important;
+    }
+}

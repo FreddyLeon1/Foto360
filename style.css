@@ -23,7 +23,7 @@ h1 {
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    background: #000;
+    background: #EEF527;
 }
 
 .controls {
@@ -42,7 +42,7 @@ button {
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
-    transition: all 0.3s;
+    transition: background 0.3s;
 }
 
 button:hover {
@@ -59,6 +59,7 @@ button:disabled {
     min-width: 60px;
 }
 
+/* Responsive para móviles */
 @media (max-width: 768px) {
     #viewer {
         height: 300px;

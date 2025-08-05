@@ -3,23 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galería 360°</title>
+    <title>Visualizador 360° Profesional</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/photo-sphere-viewer.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>Mis Fotos 360°</h1>
-        <div class="viewer-container">
-            <div id="viewer"></div>
-        </div>
+        <h1>Visualizador 360°</h1>
+        
+        <div class="main-viewer" id="viewer"></div>
+        
         <div class="controls">
             <button id="prev-btn">◀ Anterior</button>
-            <span id="photo-counter">1/4</span>
+            <span id="photo-info">Cargando...</span>
             <button id="next-btn">Siguiente ▶</button>
         </div>
-        <div class="thumbnails" id="thumbnails"></div>
+        
+        <div class="thumbnail-container">
+            <div class="thumbnails" id="thumbnails"></div>
+        </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/uevent@2/browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/photo-sphere-viewer.min.js"></script>

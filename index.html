@@ -9,18 +9,18 @@
 </head>
 <body>
     <div class="container">
-        <h1>Visualizador de Imágenes 360°</h1>
+        <h1>Visualizador 360°</h1>
+        <div id="viewer"></div>
         <div class="controls">
             <input type="file" id="image-upload" accept="image/*">
+            <p>Sube tu propia imagen 360° (formato equirectangular)</p>
         </div>
-        <div id="viewer" class="viewer-container"></div>
     </div>
-
-    <!-- Librerías necesarias -->
+    <!-- Librerías REQUERIDAS -->
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/uevent@2/browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/photo-sphere-viewer.min.js"></script>
-    
+    <!-- Nuestro script -->
     <script src="script.js"></script>
 </body>
 </html>

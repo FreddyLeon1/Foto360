@@ -1,67 +1,60 @@
-// Configuración - CAMBIA ESTO CON TUS IMÁGENES
+// Configuración de imágenes (¡Asegúrate de que las rutas sean correctas!)
 const images = [
-    'assets/foto1.jpg',
-    'assets/foto2.jpg'
+    './assets/foto1.jpg',  // Ruta relativa desde index.html
+    './assets/foto2.jpg'
 ];
 
-// Variables globales
 let currentIndex = 0;
-let viewer;
+let viewer = null;
 
-// Función para inicializar el visor
-function initViewer() {
+// Función para cargar la imagen 360°
+function loadImage(index) {
     if (viewer) {
-        viewer.destroy();
+        viewer.destroy(); // Limpiar visor anterior
     }
 
     viewer = new PhotoSphereViewer.Viewer({
         container: document.getElementById('viewer'),
-        panorama: images[currentIndex],
-        loadingImg: 'https://i.imgur.com/WWX2T1m.gif',
-        loadingTxt: 'Cargando imagen 360°...',
+        panorama: images[index],
+        loadingImg: 'https://i.imgur.com/WWX2T1m.gif', // GIF de carga
+        loadingTxt: 'Cargando experiencia 360°...',
         navbar: [
             'autorotate', // Rotación automática
-            'zoom',       // Control de zoom
+            'zoom',       // Zoom manual
             'fullscreen'  // Pantalla completa
         ],
-        size: {
-            width: '100%',
-            height: '100%'
-        },
+        defaultYaw: '0deg', // Ángulo inicial
+        autorotateDelay: 3000, // Tiempo antes de auto-rotar (ms)
+        moveSpeed: 1.5, // Velocidad de movimiento
         onReady: () => {
-            updateUI();
-            console.log('Imagen cargada correctamente:', images[currentIndex]);
+            // Actualizar interfaz cuando la imagen esté lista
+            document.getElementById('photo-info').textContent = 
+                `${index + 1}/${images.length}`;
+            console.log('Imagen cargada:', images[index]);
         },
         onError: (err) => {
-            console.error('Error al cargar la imagen:', err);
+            console.error('Error al cargar:', err);
             document.getElementById('photo-info').textContent = 'Error al cargar imagen';
         }
     });
 }
 
-// Actualizar la interfaz
-function updateUI() {
-    document.getElementById('photo-info').textContent = `${currentIndex + 1}/${images.length}`;
-    document.getElementById('prev-btn').disabled = currentIndex === 0;
-    document.getElementById('next-btn').disabled = currentIndex === images.length - 1;
-}
-
-// Navegación entre imágenes
+// Navegación
 function showNext() {
     if (currentIndex < images.length - 1) {
         currentIndex++;
-        initViewer();
+        loadImage(currentIndex);
     }
 }
 
 function showPrev() {
     if (currentIndex > 0) {
         currentIndex--;
-        initViewer();
+        loadImage(currentIndex);
     }
 }
 
-// Inicialización cuando se carga la página
+// Inicialización al cargar la página
 document.addEventListener('DOMContentLoaded', () => {
     // Verificar si hay imágenes
     if (images.length === 0) {
@@ -70,14 +63,14 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // Iniciar el visor con la primera imagen
-    initViewer();
+    // Cargar primera imagen
+    loadImage(0);
 
-    // Configurar eventos de los botones
+    // Eventos de botones
     document.getElementById('prev-btn').addEventListener('click', showPrev);
     document.getElementById('next-btn').addEventListener('click', showNext);
 
-    // Configurar eventos del teclado
+    // Eventos de teclado
     document.addEventListener('keydown', (e) => {
         if (e.key === 'ArrowRight') showNext();
         if (e.key === 'ArrowLeft') showPrev();

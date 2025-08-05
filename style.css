@@ -4,26 +4,27 @@ body {
     padding: 20px;
     background: #f5f5f5;
     color: #333;
-    text-align: center;
 }
 
 .container {
     max-width: 1000px;
     margin: 0 auto;
+    text-align: center;
 }
 
 h1 {
     color: #2c3e50;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 
-.viewer-container {
+.main-viewer {
     width: 100%;
     height: 500px;
     margin: 0 auto 20px;
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    background: #000;
 }
 
 .controls {
@@ -42,35 +43,52 @@ button {
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
-    transition: background 0.3s;
+    transition: all 0.3s;
 }
 
 button:hover {
     background: #2980b9;
+    transform: translateY(-2px);
 }
 
-#photo-counter {
+button:disabled {
+    background: #95a5a6;
+    cursor: not-allowed;
+}
+
+#photo-info {
     font-weight: bold;
-    min-width: 60px;
+    min-width: 150px;
     display: inline-block;
 }
 
+.thumbnail-container {
+    width: 100%;
+    overflow-x: auto;
+    padding: 10px 0;
+}
+
 .thumbnails {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    display: inline-flex;
     gap: 10px;
-    margin-top: 20px;
+    padding: 10px;
 }
 
 .thumbnail {
     width: 120px;
     height: 80px;
-    object-fit: cover;
     border-radius: 4px;
+    overflow: hidden;
     cursor: pointer;
-    border: 2px solid transparent;
+    position: relative;
+    border: 3px solid transparent;
     transition: all 0.3s;
+}
+
+.thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .thumbnail:hover {
@@ -83,34 +101,27 @@ button:hover {
     box-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
 }
 
-/* Verificador de imágenes */
-#error-box {
-    display: none;
-    background: #e74c3c;
-    color: white;
-    padding: 15px;
-    border-radius: 5px;
-    margin: 20px auto;
-    max-width: 500px;
-}
-
-/* Indicador de carga */
-.loading-indicator {
+.thumbnail .loading {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
 }
 
-/* Ajustes para móviles */
 @media (max-width: 768px) {
-    .viewer-container {
-        height: 300px !important;
+    .main-viewer {
+        height: 300px;
     }
     
     .thumbnail {
-        width: 80px !important;
-        height: 60px !important;
+        width: 80px;
+        height: 60px;
     }
 }

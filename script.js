@@ -6,83 +6,105 @@ document.addEventListener('DOMContentLoaded', function() {
         'assets/foto3.jpg',
         'assets/foto4.jpg'
         // Añade más imágenes según necesites
-    ];
+     ].filter(img => {
+        // Verificación automática de relación 2:1
+        return new Promise(resolve => {
+            const tester = new Image();
+            tester.src = img;
+            tester.onload = () => {
+                const isValid = Math.abs(tester.width / tester.height - 2) < 0.1;
+                if (!isValid) console.error(`Imagen ${img} no es 2:1 (${tester.width}x${tester.height})`);
+                resolve(isValid);
+            };
+            tester.onerror = () => resolve(false);
+        });
+    });
+
     let currentIndex = 0;
     let viewer;
-    const viewerContainer = document.getElementById('viewer');
-    const prevBtn = document.getElementById('prev-btn');
-    const nextBtn = document.getElementById('next-btn');
-    const photoCounter = document.getElementById('photo-counter');
-    const thumbnailsContainer = document.getElementById('thumbnails');
-    // Cargar el visualizador con la primera imagen
-    loadViewer(images[currentIndex]);
-    updateCounter();
-    createThumbnails();
-    // Navegación
-    prevBtn.addEventListener('click', showPreviousPhoto);
-    nextBtn.addEventListener('click', showNextPhoto);
-    // Teclado
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'ArrowLeft') showPreviousPhoto();
-        if (e.key === 'ArrowRight') showNextPhoto();
-    });
-    function loadViewer(imageUrl) {
-        if (viewer) {
-            viewer.destroy();
+
+    // Elementos UI
+    const ui = {
+        viewer: document.getElementById('viewer'),
+        prevBtn: document.getElementById('prev-btn'),
+        nextBtn: document.getElementById('next-btn'),
+        counter: document.getElementById('photo-counter'),
+        thumbnails: document.getElementById('thumbnails'),
+        errorBox: document.getElementById('error-box')
+    };
+    // Inicialización
+    initViewer();
+    // Eventos
+    ui.prevBtn.addEventListener('click', showPrevious);
+    ui.nextBtn.addEventListener('click', showNext);
+    document.addEventListener('keydown', handleKeys);
+    // Funciones principales
+    async function initViewer() {
+        if (images.length === 0) {
+            showError('No hay imágenes válidas (requieren relación 2:1)');
+            return;
         }
+        loadCurrentImage();
+        createThumbnails();
+    }
+    function loadCurrentImage() {
+        if (viewer) viewer.destroy();
         viewer = new PhotoSphereViewer.Viewer({
-            container: viewerContainer,
-            panorama: imageUrl,
+            container: ui.viewer,
+            panorama: images[currentIndex],
             loadingImg: 'https://i.imgur.com/WWX2T1m.gif',
-            loadingTxt: 'Cargando imagen...',
-            navbar: [
-                'autorotate',
-                'zoom',
-                'fullscreen',
-                {
-                    title: 'VR',
-                    content: '👓',
-                    onClick: () => viewer.toggleVR()
-                }
-            ],
-            autorotateDelay: 3000,
-            defaultYaw: '0deg'
+            loadingTxt: 'Cargando...',
+            navbar: getNavbar(),
+            touchmoveTwoFingers: true,
+            mousewheel: false
         });
+
+        updateCounter();
     }
-    function showNextPhoto() {
+    function getNavbar() {
+        return [
+            'autorotate',
+            'zoom',
+            'download',
+            'fullscreen',
+            {
+                title: 'VR Mode',
+                content: '👓 VR',
+                onClick: () => viewer.toggleVR()
+            }
+        ];
+    }
+    function showNext() {
         currentIndex = (currentIndex + 1) % images.length;
-        loadViewer(images[currentIndex]);
-        updateCounter();
-        updateActiveThumbnail();
+        loadCurrentImage();
     }
-    function showPreviousPhoto() {
+    function showPrevious() {
         currentIndex = (currentIndex - 1 + images.length) % images.length;
-        loadViewer(images[currentIndex]);
-        updateCounter();
-        updateActiveThumbnail();
+        loadCurrentImage();
+    }
+    function handleKeys(e) {
+        if (e.key === 'ArrowLeft') showPrevious();
+        if (e.key === 'ArrowRight') showNext();
     }
     function updateCounter() {
-        photoCounter.textContent = `${currentIndex + 1}/${images.length}`;
+        ui.counter.textContent = `${currentIndex + 1}/${images.length}`;
     }
     function createThumbnails() {
-        thumbnailsContainer.innerHTML = '';
+        ui.thumbnails.innerHTML = '';
         images.forEach((img, index) => {
-            const thumbnail = document.createElement('img');
-            thumbnail.src = img;
-            thumbnail.className = 'thumbnail' + (index === currentIndex ? ' active' : '');
-            thumbnail.alt = `Miniatura ${index + 1}`;
-            thumbnail.addEventListener('click', () => {
+            const thumb = document.createElement('div');
+            thumb.className = `thumbnail ${index === currentIndex ? 'active' : ''}`;
+            thumb.innerHTML = `<img src="${img}" alt="Miniatura ${index + 1}">`;
+            thumb.addEventListener('click', () => {
                 currentIndex = index;
-                loadViewer(images[currentIndex]);
-                updateCounter();
-                updateActiveThumbnail();
+                loadCurrentImage();
             });
-            thumbnailsContainer.appendChild(thumbnail);
+            ui.thumbnails.appendChild(thumb);
         });
     }
-    function updateActiveThumbnail() {
-        document.querySelectorAll('.thumbnail').forEach((thumb, index) => {
-            thumb.classList.toggle('active', index === currentIndex);
-        });
+
+    function showError(message) {
+        ui.errorBox.textContent = message;
+        ui.errorBox.style.display = 'block';
     }
 });

@@ -1,4 +1,4 @@
-// Lista de imágenes (¡CAMBIAR ESTAS RUTAS POR TUS ARCHIVOS!)
+// Configuración - CAMBIA ESTO CON TUS IMÁGENES
 const images = [
     'assets/foto1.jpg',
     'assets/foto2.jpg'
@@ -8,7 +8,7 @@ const images = [
 let currentIndex = 0;
 let viewer;
 
-// Inicializar el visor
+// Función para inicializar el visor
 function initViewer() {
     if (viewer) {
         viewer.destroy();
@@ -20,31 +20,33 @@ function initViewer() {
         loadingImg: 'https://i.imgur.com/WWX2T1m.gif',
         loadingTxt: 'Cargando imagen 360°...',
         navbar: [
-            'autorotate',
-            'zoom',
-            'fullscreen'
+            'autorotate', // Rotación automática
+            'zoom',       // Control de zoom
+            'fullscreen'  // Pantalla completa
         ],
-        onReady: updateUI,
-        onError: handleError
+        size: {
+            width: '100%',
+            height: '100%'
+        },
+        onReady: () => {
+            updateUI();
+            console.log('Imagen cargada correctamente:', images[currentIndex]);
+        },
+        onError: (err) => {
+            console.error('Error al cargar la imagen:', err);
+            document.getElementById('photo-info').textContent = 'Error al cargar imagen';
+        }
     });
 }
 
 // Actualizar la interfaz
 function updateUI() {
-    document.getElementById('photo-info').textContent = 
-        `${currentIndex + 1}/${images.length}`;
-    
+    document.getElementById('photo-info').textContent = `${currentIndex + 1}/${images.length}`;
     document.getElementById('prev-btn').disabled = currentIndex === 0;
     document.getElementById('next-btn').disabled = currentIndex === images.length - 1;
 }
 
-// Manejar errores
-function handleError(err) {
-    console.error('Error:', err);
-    alert('Error al cargar la imagen. Verifica la consola (F12)');
-}
-
-// Navegación
+// Navegación entre imágenes
 function showNext() {
     if (currentIndex < images.length - 1) {
         currentIndex++;
@@ -59,16 +61,23 @@ function showPrev() {
     }
 }
 
-// Eventos al cargar la página
+// Inicialización cuando se carga la página
 document.addEventListener('DOMContentLoaded', () => {
-    // Iniciar visor
+    // Verificar si hay imágenes
+    if (images.length === 0) {
+        console.error('No hay imágenes configuradas');
+        document.getElementById('photo-info').textContent = 'No hay imágenes';
+        return;
+    }
+
+    // Iniciar el visor con la primera imagen
     initViewer();
-    
-    // Botones
+
+    // Configurar eventos de los botones
     document.getElementById('prev-btn').addEventListener('click', showPrev);
     document.getElementById('next-btn').addEventListener('click', showNext);
-    
-    // Teclado
+
+    // Configurar eventos del teclado
     document.addEventListener('keydown', (e) => {
         if (e.key === 'ArrowRight') showNext();
         if (e.key === 'ArrowLeft') showPrev();

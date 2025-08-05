@@ -13,7 +13,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (file) {
             const reader = new FileReader();
             reader.onload = function(event) {
-                // Destruir el viewer anterior si existe
                 if (viewer) {
                     viewer.destroy();
                 }
@@ -27,32 +26,28 @@ document.addEventListener('DOMContentLoaded', function() {
         viewer = new PhotoSphereViewer.Viewer({
             container: container,
             panorama: imageSrc,
-            caption: 'Imagen 360°',
-            loadingImg: 'https://photo-sphere-viewer.js.org/assets/photosphere-logo.gif',
+            loadingImg: 'https://i.imgur.com/WWX2T1m.gif',
+            loadingTxt: 'Cargando imagen 360°...',
             defaultLat: 0,
             defaultLong: 0,
-            defaultZoomLvl: 50,
             navbar: [
+                'autorotate',
                 'zoom',
-                'move',
                 'download',
                 'fullscreen',
-                'caption',
                 {
                     title: 'Ver en VR',
-                    content: '👓',
+                    content: '👓 VR',
                     onClick: () => viewer.toggleVR()
                 }
             ],
             plugins: [
                 [PhotoSphereViewer.SettingsPlugin, {
                     lang: {
+                        autorotate: 'Rotación automática',
                         zoom: 'Zoom',
-                        move: 'Mover',
                         download: 'Descargar',
-                        fullscreen: 'Pantalla completa',
-                        settings: 'Ajustes',
-                        vr: 'Realidad virtual'
+                        fullscreen: 'Pantalla completa'
                     }
                 }]
             ]

@@ -3,24 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visualizador 360°</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/photo-sphere-viewer.min.css">
-    <link rel="stylesheet" href="style.css">
+    <title>Visualizador 360° Funcional</title>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/photo-sphere-viewer.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        #viewer-container {
+            width: 100%;
+            max-width: 800px;
+            height: 500px;
+            margin: 20px auto;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .controls {
+            margin: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Visualizador - 360°</h1>
-        <div id="viewer"></div>
-        <div class="controls">
-            <button id="prev-btn">◀ Anterior</button>
-            <span id="photo-info">Cargando...</span>
-            <button id="next-btn">Siguiente ▶</button>
-        </div>
+    <h1>Visualizador 360°</h1>
+    <div id="viewer-container"></div>
+    <div class="controls">
+        <button id="prev-btn">Anterior</button>
+        <span id="photo-counter">1/2</span>
+        <button id="next-btn">Siguiente</button>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/uevent@2/browser.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/photo-sphere-viewer.min.js"></script>
-    <script src="script.js"></script>
+
+    <script>
+        // Configuración simple
+        const images = [
+            'assets/foto1.jpg',
+            'assets/foto2.jpg'
+        ];
+        
+        let currentIndex = 0;
+        let viewer;
+        
+        function loadImage(index) {
+            if (viewer) viewer.destroy();
+            
+            viewer = new PhotoSphereViewer.Viewer({
+                container: document.querySelector('#viewer-container'),
+                panorama: images[index],
+                loadingImg: 'https://i.imgur.com/WWX2T1m.gif',
+                loadingTxt: 'Cargando...',
+                navbar: [
+                    'autorotate',
+                    'zoom',
+                    'fullscreen'
+                ],
+                size: {
+                    width: '100%',
+                    height: '100%'
+                }
+            });
+            
+            document.getElementById('photo-counter').textContent = `${index + 1}/${images.length}`;
+        }
+        
+        // Eventos
+        document.getElementById('prev-btn').addEventListener('click', () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+                loadImage(currentIndex);
+            }
+        });
+        
+        document.getElementById('next-btn').addEventListener('click', () => {
+            if (currentIndex < images.length - 1) {
+                currentIndex++;
+                loadImage(currentIndex);
+            }
+        });
+        
+        // Iniciar
+        loadImage(0);
+    </script>
 </body>
 </html>
-

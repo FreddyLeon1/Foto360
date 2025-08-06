@@ -42,7 +42,6 @@ button {
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
-    transition: background 0.3s;
 }
 
 button:hover {
@@ -56,12 +55,6 @@ button:disabled {
 
 #photo-info {
     font-weight: bold;
-    min-width: 120px;
+    min-width: 100px;
     display: inline-block;
-}
-
-@media (max-width: 768px) {
-    #viewer {
-        height: 300px;
-    }
 }
